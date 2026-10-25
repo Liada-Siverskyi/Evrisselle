@@ -1,0 +1,8 @@
+<services>
+  <service name="download_files" />
+  <service name="verify_file">
+    <param name="file">plasma-workspace-6.7.5.tar.xz</param>
+    <param name="verifier">sha256</param>
+    <param name="checksum">94ab21e2243b7876f65c315f1e545081c6437f5bd0a041ca4fb6c2533ae874c9</param>
+  </service>
+</services>

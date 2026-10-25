@@ -1,0 +1,8 @@
+# OBS and local RPM build output
+.osc/
+_build/
+*.rpm
+*.src.rpm
+_service:*
+packaging/opensuse/plasma6-workspace/plasma-workspace-*.tar.xz*
+

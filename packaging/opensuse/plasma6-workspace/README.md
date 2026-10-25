@@ -26,4 +26,4 @@ The source spec has not yet been built. `osc` and RPM build tools are not instal
 
 The X11 window manager is provided separately by openSUSE's `kwin6-x11` package; it is not built from this recipe.
 
-After building and installing into a staging root or disposable VM, run `scripts/check-session-root.sh <root>` to confirm the X11 executable, KWin/X11 dependency, branded session entry, and existing Wayland entry are all present.
+After building and installing into a staging root or disposable VM, run `bash scripts/check-session-root.sh <root>` to confirm the X11 executable, KWin/X11 dependency, branded session entry, and existing Wayland entry are all present.

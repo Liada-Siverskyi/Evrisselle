@@ -6,23 +6,28 @@
 | First product | Evrisselle Ionis Undecima |
 | Purpose | Keep a usable Plasma X11 desktop available to people who need X11 |
 | First distribution | openSUSE Tumbleweed |
-| Session model | X11 and Wayland are distinct choices in the same login manager |
-| First implementation | Downstream RPM packaging of upstream Plasma 6.7.5 X11 paths |
-| KWin | Use the separately packaged `kwin6-x11`; do not fork it for the first prototype |
+| Target baseline | Plasma 6.8.1 on the user's Tumbleweed system |
+| Session model | X11 and Wayland are separate choices in the same login manager |
+| Initial implementation | Downstream forward-port of the removed X11 session and runtime paths to Plasma 6.8.1 |
+| KWin | Package the pinned Sonic-DE `sonic-win` community fork as a separate `kwin6-x11`; do not reuse the 6.7.5 binary |
 | Maintenance | Solo maintainer, best-effort updates and compatibility fixes, no SLA |
-| Public release | After the MVP passes clean-build and isolated-session checks |
-| Long-term scope | Aim for feature parity with the supported Plasma release; assess forward-ports when upstream removes X11 code |
+| Public release | After a clean build and isolated-session acceptance checks |
 
-## Scope of the first prototype
+## Selected engineering scope
 
-The prototype rebuilds `plasma6-workspace` with `WITH_X11_SESSION=ON` and adds a product-branded X11 session entry. The stock Wayland session remains in the same build and is still selectable. It depends on the openSUSE `kwin6-x11` package and does not yet maintain a private KWin fork.
+Plasma 6.8.1 is the chosen baseline. The work restores the X11 session startup path and the runtime code needed by a usable Plasma desktop, while preserving the distribution's Wayland session. The matched `sonic-win` KWin and Workspace RPMs built and passed an initial disposable-VM login check for both X11 and Wayland. They are now installed on the Mac Pro after a successful solver dry run and pre-install Snapper snapshot. Both SDDM choices are present, and the active Wayland session remains available; the first target X11 login and broader acceptance checks remain open.
 
-The initial source baseline is Plasma 6.7.5 because that source still contains the complete X11 startup path. This is a starting snapshot, not a promise to stay on 6.7.5 indefinitely. A rolling-distribution update can change the ABI or remove dependencies; each update must be built and tested as a compatible set before being advertised.
+KDE removed more than a CMake switch in 6.8. The workspace no longer builds `startplasma-x11` or installs the X11 session and systemd target; KWin's 6.8.1 source no longer builds `kwin_x11`; and Workspace components lost several X11 code paths. The 6.7.5 packaging prototype is not compatible with the selected baseline.
 
-## Not part of the first prototype
+## Release and safety boundary
 
-- A separate operating system or a Wayland replacement.
-- New desktop features or a promise to match upstream on every release.
-- A public package repository before the MVP passes its acceptance checks.
-- KDE logos or any claim that KDE officially supports or endorses Ionis Undecima.
+- Do not publish or describe the source as a working 6.8.1 X11 session until it builds and passes the isolated VM acceptance checks.
+- Do not install the existing 6.7.5 X11 RPMs against the target's 6.8.1 stack.
+- Keep source archives, signatures, checksums, patches, and build instructions reproducible.
+- Keep SSH and sudo credentials out of scripts and Git.
+- Preserve a working Wayland login and a tested Btrfs/Snapper rollback path.
+- Do not use KDE logos or claim official KDE support or endorsement.
 
+## Fallback
+
+The earlier 6.7.5 prototype remains a separate fallback if the 6.8.1 forward-port proves impractical. Switching to it would require a new explicit decision and a complete package-set dry run; it is not the active implementation.

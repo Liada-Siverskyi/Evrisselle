@@ -4,32 +4,32 @@
 
 ```text
 SDDM session selector
-  ├─ Plasma (Wayland)                    existing plasma6-session entry
-  └─ Evrisselle Ionis Undecima (X11)       xsessions desktop entry
-       └─ startplasma-x11                 built by plasma6-workspace
-            └─ kwin_x11                   provided by kwin6-x11
+  ├─ Plasma (Wayland)                     stock Tumbleweed session
+  └─ Evrisselle Ionis Undecima             downstream X11 session entry
+       └─ startplasma-x11                 restored from Plasma workspace
+            └─ kwin_x11                  compatibility link to the pinned sonic-win build
 ```
 
-Both choices live on one installed system. Ionis Undecima adds an X11 session entry; it does not change the existing Wayland entry.
+The selected baseline is Plasma 6.8.1. The ordinary Wayland session remains supplied by the distribution. Ionis Undecima adds a separately selectable X11 path and must not replace the Wayland files or services.
 
-## Package shape
+## Package set
 
-The RPM spec is based on openSUSE's `plasma6-workspace` packaging for Plasma 6.7.5. It is configured to rebuild the workspace with `-DWITH_X11_SESSION=ON`. That option causes the upstream build to include X11 startup code, the X11 session target, and X11-only workspace paths which the stock package build does not ship.
+The 6.8.1 source no longer builds an X11 login session when `WITH_X11_SESSION` is set. The option is declared but unused. `startplasma-wayland` is built directly from `startplasma.cpp`; X11 startup, the X11 login template, and the X11 systemd target were removed. Plasma Shell also lost X11-specific code, and KWin 6.8.1 builds `kwin_wayland`, not the standalone `kwin_x11` window manager.
 
-The build is configured to emit:
+The port therefore needs a version-matched downstream source set, not just a renamed `.desktop` file. The initial package boundary is:
 
-- `plasma6-workspace`, rebuilt from the matching source and retaining its Wayland files;
-- `plasma6-session`, retaining the ordinary Plasma Wayland login entry;
-- `evrisselle-ionis-undecima-session`, containing `startplasma-x11` and the branded X11 `.desktop` entry.
+- `plasma6-workspace`: restore and brand the X11 start path and its session target while keeping Wayland enabled; restore any Workspace runtime paths required for the X11 desktop.
+- `kwin6-x11`: package the pinned SonicDE `sonic-win` community fork, providing `kwin_x11` plus its separate plugins and libraries alongside stock Wayland KWin.
+- Additional Plasma components: include a package only when the source audit or build proves 6.8.1 removed a required X11 path from it. Do not mix 6.7.5 binaries into the 6.8.1 stack.
 
-The session package requires `kwin6-x11`, `plasma6-session`, the Xorg server, and the Xorg libinput driver. KWin/X11 is a separate upstream source/package; the prototype uses openSUSE's package instead of duplicating it.
+The Workspace patch, source checksum service, and 6.8.1 package recipe are in `packaging/opensuse/plasma68-forwardport/workspace/`. The KWin candidate source pin and package recipe are in `packaging/opensuse/plasma68-forwardport/kwin6-x11/`. SonicDE is a community fork, not an official KDE 6.8.1 release. The matched package set has passed one X11 login and one subsequent Wayland login in a disposable VM and is installed on the target. SDDM exposes both session choices; the target's first X11 login and broader compatibility checks remain. The existing 6.7.5 prototype is retained only as a fallback reference.
 
-## Version compatibility
+## Compatibility boundary
 
-The first spec pins its source to Plasma 6.7.5 and raises the package release so Tumbleweed can install the rebuilt workspace package over the stock build of the same source version. Workspace, session, KWin/X11, and the relevant Plasma libraries must be treated as a versioned set.
+The target machine has Plasma workspace, desktop, and Wayland KWin at 6.8.1. The matched package set now supplies `kwin6-x11`, the branded session, and Workspace 6.8.1 forward-port packages. The previous 6.7.5 `libkwin-x11-6` library was replaced. Both the branded X11 session and stock Wayland session files are installed.
 
-Plasma 6.8 removed the upstream X11 session startup files. Upgrading only the session package cannot restore the removed code. The update process must either keep a compatible 6.7.x package set temporarily or forward-port the X11 path and its dependencies, then validate the combined stack. The prototype does not silently claim compatibility with Plasma 6.8.
+Every Evrisselle X11 binary and plugin must be built against the same 6.8.1 package snapshot used by the target. The system's existing Wayland session must remain selectable and pass a login check after installation and rollback.
 
 ## Branding
 
-The login entry is named `Evrisselle Ionis Undecima (X11)`. Its description identifies it as a Plasma X11 session maintained by Evrisselle. The package retains upstream KDE copyright and license notices and uses no KDE logo.
+The login entry is named `Evrisselle Ionis Undecima`. Its description identifies it as an independently maintained Plasma session. Retain all upstream copyright and license notices; do not use KDE logos or imply KDE endorsement.

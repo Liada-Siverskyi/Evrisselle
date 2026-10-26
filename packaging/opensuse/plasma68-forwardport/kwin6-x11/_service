@@ -1,0 +1,8 @@
+<services>
+  <service name="download_files" />
+  <service name="verify_file">
+    <param name="file">02cfdd70b575d0732a92e0311a30c93e5fa823df.tar.gz</param>
+    <param name="verifier">sha256</param>
+    <param name="checksum">67bdd3641dd9b61f9e6b5a33c080a0006743e01813072b3278fcd394ce667412</param>
+  </service>
+</services>

@@ -1,0 +1,42 @@
+diff --git a/libtaskmanager/abstracttasksproxymodeliface.h b/libtaskmanager/abstracttasksproxymodeliface.h
+--- a/libtaskmanager/abstracttasksproxymodeliface.h
++++ b/libtaskmanager/abstracttasksproxymodeliface.h
+@@ -132,4 +132,14 @@
+     void requestToggleFullScreen(const QModelIndex &index) override;
+ 
++    /**
++     * Request toggling the shaded state of the task at the given index.
++     *
++     * This is meant for tasks that have an associated window, and may be
++     * a no-op when there is no window.
++     *
++     * @param index An index in this tasks model.
++     **/
++    void requestToggleShaded(const QModelIndex &index) override;
++
+     /**
+      * Request toggling the no border state of the task at given index.
+diff --git a/libtaskmanager/abstracttasksproxymodeliface.cpp b/libtaskmanager/abstracttasksproxymodeliface.cpp
+--- a/libtaskmanager/abstracttasksproxymodeliface.cpp
++++ b/libtaskmanager/abstracttasksproxymodeliface.cpp
+@@ -164,6 +164,20 @@
+     }
+ }
+ 
++void AbstractTasksProxyModelIface::requestToggleShaded(const QModelIndex &index)
++{
++    if (!index.isValid()) {
++        return;
++    }
++
++    const QModelIndex &sourceIndex = mapIfaceToSource(index);
++    const auto *m = dynamic_cast<const AbstractTasksModelIface *>(sourceIndex.model());
++
++    if (m) {
++        const_cast<AbstractTasksModelIface *>(m)->requestToggleShaded(sourceIndex);
++    }
++}
++
+ void AbstractTasksProxyModelIface::requestToggleNoBorder(const QModelIndex &index)
+ {
+     if (!index.isValid()) {

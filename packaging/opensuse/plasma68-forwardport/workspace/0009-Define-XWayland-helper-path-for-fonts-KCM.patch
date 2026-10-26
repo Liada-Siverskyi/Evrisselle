@@ -1,0 +1,5 @@
+diff --git a/kcms/fonts/CMakeLists.txt b/kcms/fonts/CMakeLists.txt
+--- a/kcms/fonts/CMakeLists.txt
++++ b/kcms/fonts/CMakeLists.txt
+@@ -34,0 +35 @@
++target_compile_definitions(kcm_fonts PRIVATE CMAKE_INSTALL_FULL_LIBEXECDIR="${CMAKE_INSTALL_FULL_LIBEXECDIR}")

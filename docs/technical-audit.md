@@ -1,28 +1,37 @@
 # Technical audit
 
-## Tumbleweed checkout
+## Target Tumbleweed system (checked 2026-10-26)
 
-The target machine currently has `kwin6`, `plasma6-workspace`, and `plasma6-session` at 6.7.5. Its installed files include the Wayland session descriptor and `startplasma-wayland`, but not `kwin_x11`, `startplasma-x11`, or a Plasma entry under `/usr/share/xsessions`. The existing system therefore cannot be repaired by adding only a login-menu shortcut.
+SSH access to the target works. The target reports openSUSE Tumbleweed snapshot 20261017. After the 2026-10-26 installation it has:
 
-The missing pieces are available as separate source/package pieces at the 6.7.5 baseline:
+- `plasma6-desktop` and Wayland `kwin6` at 6.8.1-1.1 from openSUSE;
+- the Evrisselle `plasma6-workspace`, workspace libraries, Plasma session, `kwin6-x11`, and branded session packages at 6.8.1-2.1.evrisselle1 / 6.8.0-2.1.evrisselle1;
+- no `plasma6-session-x11`; the branded `Evrisselle Ionis Undecima` session replaces its SDDM role;
+- Qt 6.12.0-1.1, KF 6.31.0-1.2, and KDecoration3 6.8.0-1.1.
 
-- `plasma-workspace` 6.7.5 has `WITH_X11_SESSION`, the `startplasma-x11` target, and the X11 session desktop template. The session option also enables the X11 workspace build path.
-- `kwin-x11` 6.7.5 is a separate KDE source archive and builds `kwin_x11` independently of the Wayland KWin package.
-- openSUSE packaging splits the X11 session payload from the Wayland session payload.
+The earlier X11 SDDM attempt failed while using the incompatible 6.7.5 X11 packages with Plasma 6.8.1. Before the matched install, a read-only SSH check found no `kwin6-x11` or `plasma6-session-x11` package and found an old 6.7.5 `libkwin-x11-6`; the matched transaction replaced that library. The new candidate is now installed, and a real X11 login on the Mac Pro remains to be tried.
 
-The prototype consequently rebuilds Workspace with X11 enabled and uses openSUSE's separately packaged `kwin6-x11`.
+The enabled OBS repository contains a wider 6.7.5 Plasma set, but aligning to that set is not the selected plan. The six candidate RPMs were staged and checksum-verified, then installed after a successful package-manager dry run. The transaction also installed four solver-selected dependencies. A Snapper `root` snapshot was created before the package change. Post-install SSH checks confirm all six Evrisselle RPM versions and both SDDM session names; the active Wayland session remains running.
+
+The target root filesystem is Btrfs and `snapper list-configs` reports the `root` configuration. No Plasma package locks are configured. A pre-change `root` snapshot was created before the target transaction.
 
 ## Upstream transition
 
-Plasma 6.8 removed the X11 login-session templates, `startplasma-x11`, and the X11 systemd target; it also removed several X11-specific Workspace and settings paths. The X11 code cannot be recovered on 6.8 by changing one CMake flag. Forward-porting it is a later engineering milestone.
+KDE states that Plasma 6.8 retires starting X11 sessions while continuing to support individual X11 applications through XWayland. The 6.7.5-to-6.8.0 changelog records removal of the X11 `startplasma` path, X11 login-session and `startkde` paths, the standalone X11 KWin backend, and multiple Workspace shell and settings paths.
 
-KDE announced Plasma 6.7 as the final release line with an X11 session, with bug-fix support expected into early 2027. This makes 6.7.5 a practical prototype base, while also making version tracking and security backports part of the product's core maintenance work.
+The 6.8.1 `plasma-workspace` CMake file still declares `WITH_X11_SESSION`, but the option no longer controls a target. Its `startkde` build installs `startplasma-wayland` only. The X11 launcher, X11 login template, and `plasma-workspace-x11.target` from 6.7.5 are absent.
+
+KWin 6.8.1 builds `kwin_wayland`; its `KWIN_BUILD_X11` option enables X11/XWayland code used with Wayland, not the standalone X11 window manager. The separate `kwin-x11` release source and the target's installed `kwin_x11` binary are 6.7.5.
+
+See the [forward-port audit](forward-port-audit.md) for source-level findings and remaining components to inspect.
+
+## Current build environment
+
+An isolated openSUSE Tumbleweed 20261024 container produced the matched runtime RPM set: Plasma Workspace and session packages at 6.8.1-2.1.evrisselle1 and KWin X11 at 6.8.0-2.1.evrisselle1. The KWin package explicitly provides the WindowView QML import registered by its own effect code. Qt 6.12 and KF 6.31 match the target; KDecoration3 is 6.8.1 in the build environment and 6.8.0 on the target, with candidate ABI symbols checked. A disposable KDE VM installed the package set and successfully logged into both X11 and Wayland. The target dry run and installation also completed; the SDDM entries are present and the original Wayland session remains active. The target's first X11 login and broader VM acceptance checks remain open.
 
 ## References
 
-- [Plasma 6.8 announcement](https://kde.org/announcements/plasma/6/6.8.0/)
-- [KDE's Plasma 6.7 X11 support notice](https://planet.kde.org/david-edmundson-2026-06-02-ex-11-prepping-for-plasmas-last-x11-supported-release/)
-- [KDE's X11 support FAQ](https://blogs.kde.org/2025/11/26/going-all-in-on-a-wayland-future/)
-- [Plasma 6.7.5 source directory](https://download.kde.org/stable/plasma/6.7.5/)
-- [openSUSE OBS Plasma X11 package sources used as packaging reference](https://api.opensuse.org/public/source/home:cfeck:Plasma-X11/plasma6-workspace/)
-
+- [Plasma 6.8 release announcement](https://kde.org/announcements/plasma/6/6.8.0/)
+- [Plasma 6.7.5–6.8.0 complete changelog](https://kde.org/announcements/changelogs/plasma/6/6.7.5-6.8.0/)
+- [KDE `kwin-x11` 6.7.5 source package in OBS](https://api.opensuse.org/public/source/home:cfeck:Plasma-X11/kwin6-x11)
+- [openSUSE Plasma X11 RPM repository](https://download.opensuse.org/repositories/home:/cfeck:/Plasma-X11/openSUSE_Tumbleweed/)

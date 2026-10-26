@@ -1,0 +1,84 @@
+--- a/libtaskmanager/taskgroupingproxymodel.h
++++ b/libtaskmanager/taskgroupingproxymodel.h
+@@ -288,6 +288,16 @@
+     void requestToggleFullScreen(const QModelIndex &index) override;
+ 
++    /**
++     * Request toggling the shaded state of the task at the given index.
++     *
++     * This is meant for tasks that have an associated window, and may be
++     * a no-op when there is no window.
++     *
++     * @param index An index in this tasks model.
++     **/
++    void requestToggleShaded(const QModelIndex &index) override;
++
+     /**
+      * Request toggling the no border state of the task at given index.
+      *
+      * This is meant for tasks that have an associated window, and may be
+--- a/libtaskmanager/taskgroupingproxymodel.cpp
++++ b/libtaskmanager/taskgroupingproxymodel.cpp
+@@ -1121,6 +1121,27 @@
+     }
+ }
+ 
++void TaskGroupingProxyModel::requestToggleShaded(const QModelIndex &index)
++{
++    if (!d->abstractTasksSourceModel || !index.isValid() || index.model() != this) {
++        return;
++    }
++
++    if (index.parent().isValid() || !d->isGroup(index.row())) {
++        d->abstractTasksSourceModel->requestToggleShaded(mapToSource(index));
++    } else {
++        const bool goalState = !index.data(AbstractTasksModel::IsShaded).toBool();
++
++        for (int i = 0; i < rowCount(index); ++i) {
++            const QModelIndex &child = this->index(i, 0, index);
++
++            if (child.data(AbstractTasksModel::IsShaded).toBool() != goalState) {
++                d->abstractTasksSourceModel->requestToggleShaded(mapToSource(child));
++            }
++        }
++    }
++}
++
+ void TaskGroupingProxyModel::requestToggleNoBorder(const QModelIndex &index)
+ {
+     if (!d->abstractTasksSourceModel || !index.isValid() || index.model() != this) {
+--- a/libtaskmanager/tasksmodel.h
++++ b/libtaskmanager/tasksmodel.h
+@@ -859,6 +859,16 @@
+     Q_INVOKABLE void requestToggleFullScreen(const QModelIndex &index) override;
+ 
++    /**
++     * Request toggling the shaded state of the task at the given index.
++     *
++     * This is meant for tasks that have an associated window, and may be
++     * a no-op when there is no window.
++     *
++     * @param index An index in this tasks model.
++     **/
++    Q_INVOKABLE void requestToggleShaded(const QModelIndex &index) override;
++
+     /**
+      * Request toggling the no border state of the task at given index.
+      *
+      * This is meant for tasks that have an associated window, and may be
+--- a/libtaskmanager/tasksmodel.cpp
++++ b/libtaskmanager/tasksmodel.cpp
+@@ -1558,6 +1558,13 @@
+     }
+ }
+ 
++void TasksModel::requestToggleShaded(const QModelIndex &index)
++{
++    if (index.isValid() && index.model() == this) {
++        d->abstractTasksSourceModel->requestToggleShaded(mapToSource(index));
++    }
++}
++
+ void TasksModel::requestToggleNoBorder(const QModelIndex &index)
+ {
+     if (index.isValid() && index.model() == this) {

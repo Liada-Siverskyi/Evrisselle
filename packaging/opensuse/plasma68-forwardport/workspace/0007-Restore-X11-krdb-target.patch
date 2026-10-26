@@ -1,0 +1,69 @@
+--- a/kcms/CMakeLists.txt
++++ b/kcms/CMakeLists.txt
+@@ -1,2 +1,4 @@
++add_subdirectory(krdb)
++
+ add_subdirectory(desktoptheme)
+ add_subdirectory(icons)
+diff --git a/kcms/krdb/CMakeLists.txt b/kcms/krdb/CMakeLists.txt
+new file mode 100644
+--- /dev/null
++++ b/kcms/krdb/CMakeLists.txt
+@@ -0,0 +1,46 @@
++add_definitions(-DTRANSLATION_DOMAIN=\"krdb\")
++
++add_library(krdb krdb.cpp)
++
++generate_export_header(krdb)
++
++target_include_directories(krdb PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>" "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>" "$<INSTALL_INTERFACE:${KDE_INSTALL_INCLUDEDIR}/krdb>")
++
++target_link_libraries(krdb PRIVATE Qt::Widgets Qt::DBus KF6::CoreAddons KF6::DBusAddons KF6::GuiAddons KF6::I18n KF6::WindowSystem KF6::ColorScheme X11::X11 Qt::GuiPrivate)
++
++if(HAVE_X11)
++  target_link_libraries(krdb PRIVATE XCB::XCB XCB::CURSOR)
++endif()
++
++install(TARGETS krdb ${KDE_INSTALL_TARGETS_DEFAULT_ARGS} LIBRARY NAMELINK_SKIP)
++
++install(TARGETS krdb EXPORT krdbLibraryTargets ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
++
++install(FILES krdb.h
++    ${CMAKE_CURRENT_BINARY_DIR}/krdb_export.h
++    DESTINATION ${KDE_INSTALL_INCLUDEDIR}/krdb COMPONENT Devel
++)
++
++set(CMAKECONFIG_INSTALL_DIR ${KDE_INSTALL_CMAKEPACKAGEDIR}/Krdb)
++configure_package_config_file(KrdbConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/KrdbConfig.cmake"
++    INSTALL_DESTINATION ${CMAKECONFIG_INSTALL_DIR}
++)
++
++write_basic_config_version_file(${CMAKE_CURRENT_BINARY_DIR}/KrdbConfigVersion.cmake
++    VERSION "${PROJECT_VERSION}"
++    COMPATIBILITY AnyNewerVersion
++)
++
++install(
++    FILES
++        ${CMAKE_CURRENT_BINARY_DIR}/KrdbConfig.cmake
++        ${CMAKE_CURRENT_BINARY_DIR}/KrdbConfigVersion.cmake
++    DESTINATION ${CMAKECONFIG_INSTALL_DIR}
++)
++
++install(
++    EXPORT krdbLibraryTargets
++    NAMESPACE PW::
++    DESTINATION ${CMAKECONFIG_INSTALL_DIR}
++    FILE krdbLibraryTargets.cmake
++)
+diff --git a/kcms/krdb/KrdbConfig.cmake.in b/kcms/krdb/KrdbConfig.cmake.in
+new file mode 100644
+--- /dev/null
++++ b/kcms/krdb/KrdbConfig.cmake.in
+@@ -0,0 +1,6 @@
++# SPDX-FileCopyrightText: 2025 Vlad Zahorodnii <vlad.zahorodnii@kde.org>
++# SPDX-License-Identifier: BSD-3-Clause
++
++@PACKAGE_INIT@
++
++include("${CMAKE_CURRENT_LIST_DIR}/krdbLibraryTargets.cmake")

@@ -1,0 +1,26 @@
+diff --git a/kcms/style/kcmstyle.cpp b/kcms/style/kcmstyle.cpp
+--- a/kcms/style/kcmstyle.cpp
++++ b/kcms/style/kcmstyle.cpp
+@@ -21,0 +22 @@
++#include "../krdb/krdb.h"
+diff --git a/kcms/style/CMakeLists.txt b/kcms/style/CMakeLists.txt
+--- a/kcms/style/CMakeLists.txt
++++ b/kcms/style/CMakeLists.txt
+@@ -42,0 +43,4 @@
++if(HAVE_X11)
++    target_link_libraries(kcm_style PRIVATE krdb)
++endif()
++
+diff --git a/kcms/fonts/fonts.cpp b/kcms/fonts/fonts.cpp
+--- a/kcms/fonts/fonts.cpp
++++ b/kcms/fonts/fonts.cpp
+@@ -33,0 +34 @@
++#include "../krdb/krdb.h"
+diff --git a/kcms/fonts/CMakeLists.txt b/kcms/fonts/CMakeLists.txt
+--- a/kcms/fonts/CMakeLists.txt
++++ b/kcms/fonts/CMakeLists.txt
+@@ -44,0 +45,4 @@
++if(HAVE_X11)
++    target_link_libraries(kcm_fonts PRIVATE krdb)
++endif()
++

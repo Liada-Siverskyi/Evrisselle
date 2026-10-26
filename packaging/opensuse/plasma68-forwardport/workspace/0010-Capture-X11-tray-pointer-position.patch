@@ -1,0 +1,6 @@
+diff --git a/applets/systemtray/systemtray.cpp b/applets/systemtray/systemtray.cpp
+--- a/applets/systemtray/systemtray.cpp
++++ b/applets/systemtray/systemtray.cpp
+@@ -639 +639 @@ void SystemTray::openContextMenu(const QString &service, QPoint pos, QQuickItem *statusNotifierIcon)
+-        [this, statusNotifierIcon = QPointer<QQuickItem>{statusNotifierIcon}](QMenu *menu) {
++        [this, pos, statusNotifierIcon = QPointer<QQuickItem>{statusNotifierIcon}](QMenu *menu) {

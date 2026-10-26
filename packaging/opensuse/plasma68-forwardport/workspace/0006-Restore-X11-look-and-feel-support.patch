@@ -1,0 +1,22 @@
+--- a/libklookandfeel/klookandfeelmanager.cpp
++++ b/libklookandfeel/klookandfeelmanager.cpp
+@@ -14,0 +15,2 @@
++#include "../kcms/krdb/krdb.h"
++#include <KWindowSystem>
+@@ -62,0 +63,1 @@
++    , m_plasmashellChanged(false)
+@@ -254,0 +255,1 @@
++    m_plasmashellChanged = true;
+--- a/libklookandfeel/klookandfeelmanager.h
++++ b/libklookandfeel/klookandfeelmanager.h
+@@ -126,2 +126,3 @@
+     Mode m_mode = Mode::Apply;
++    bool m_plasmashellChanged : 1;
+     bool m_fontsChanged : 1;
+--- a/libklookandfeel/CMakeLists.txt
++++ b/libklookandfeel/CMakeLists.txt
+@@ -51,2 +51,4 @@
+         KF6::KIOGui
++        KF6::WindowSystem
++        krdb
+ )

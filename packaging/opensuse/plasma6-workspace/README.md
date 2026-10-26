@@ -1,6 +1,8 @@
-# openSUSE Tumbleweed package
+# Plasma 6.7.5 fallback prototype
 
-This OBS source package rebuilds `plasma6-workspace` from the KDE 6.7.5 release with `WITH_X11_SESSION=ON`. It adds the `evrisselle-ionis-undecima-session` RPM, containing `startplasma-x11` and a distinct product-branded X11 session entry. The regular Wayland session remains in `plasma6-session`.
+This package set is retained as a reference for the 6.7.5 X11 session path. It is not the selected implementation and must not be installed against the target's Plasma 6.8.1 packages. The active plan is the 6.8.1 forward-port documented in `docs/deployment-plan.md` and `docs/forward-port-audit.md`.
+
+This OBS source package prototype rebuilds `plasma6-workspace` from the KDE 6.7.5 release with `WITH_X11_SESSION=ON`. It adds the `evrisselle-ionis-undecima-session` RPM, containing `startplasma-x11` and a distinct product-branded X11 session entry. The regular Wayland session remains in `plasma6-session`.
 
 The package spec is based on the openSUSE packaging snapshot used by the community Plasma X11 build, with unrelated optional downstream patches removed. It is not linked to that OBS project at build time. The source tarball and detached KDE signature are downloaded from the official KDE release directory; `_service` checks the tarball SHA-256 before a package build.
 
@@ -26,4 +28,4 @@ The source spec has not yet been built. `osc` and RPM build tools are not instal
 
 The X11 window manager is provided separately by openSUSE's `kwin6-x11` package; it is not built from this recipe.
 
-After building and installing into a staging root or disposable VM, run `bash scripts/check-session-root.sh <root>` to confirm the X11 executable, KWin/X11 dependency, branded session entry, and existing Wayland entry are all present.
+After building and installing into a staging root or disposable VM, run `scripts/check-session-root.sh <root>` to confirm the X11 executable, KWin/X11 dependency, branded session entry, and existing Wayland entry are all present.

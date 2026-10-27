@@ -1,14 +1,13 @@
 # KWin X11 candidate for Ionis Undecima
 
-This package uses the pinned SonicDE `sonic-win` source commit `02cfdd70b575d0732a92e0311a30c93e5fa823df` (2026-10-25). It is an X11-focused community fork whose build installs `libkwin-x11.so.6` and plugins under `kwin-x11`, separate from the distribution's Wayland KWin files. The package keeps the upstream `sonic-win` executable and adds the `kwin_x11` and `plasma-kwin_x11.service` compatibility links used by the restored Plasma X11 startup.
+This recipe packages the SonicDE `sonic-win` community fork at commit `02cfdd70b575d0732a92e0311a30c93e5fa823df` (recorded upstream date: 2026-10-25). The fork installs `libkwin-x11.so.6` and plugins separately from the distribution's Wayland KWin files. The package retains the `sonic-win` executable and adds `kwin_x11` and `plasma-kwin_x11.service` compatibility links for the restored Plasma X11 startup path.
 
-The GitHub source archive is SHA-256 pinned in `_service` and its license notices remain in the built package. This is a candidate KWin implementation for the 6.8.1 Workspace session, not an official KDE 6.8.1 KWin release. The effect registers the `org.kde.KWin.Effect.WindowView` QML type from C++; the RPM spec declares that runtime module capability explicitly so the package solver can match its import in the effect QML.
+`_service` verifies SHA-256 `67bdd3641dd9b61f9e6b5a33c080a0006743e01813072b3278fcd394ce667412` for the archive fetched from the pinned commit. The spec declares the `WindowView` QML capability registered by the effect's C++ code. This is a candidate downstream implementation, not an official KDE KWin release.
 
-## Build status
+## Status and evidence limits
 
-- CMake configuration and the full `sonic-win` build succeeded in an isolated openSUSE Tumbleweed 20261024 container with Qt 6.12, KF 6.31, and KDecoration3 6.8.1.
-- The target machine has Qt 6.12 and KF 6.31, but KDecoration3 6.8.0. The candidate uses the 6.8.0 API baseline; a symbol check found no unresolved KDecoration3 symbols against the target's 6.8.0 libraries.
-- The staged installation contained 1452 files and had no path overlap with the target's installed `kwin6` 6.8.1 package.
-- The matched runtime RPMs are `kwin6-x11` and `libkwin-x11-6` 6.8.0-2.1.evrisselle1. In a disposable KDE VM, SDDM launched the X11 session successfully and Wayland also started afterward.
+Earlier project notes report a successful isolated build and an initial disposable-VM X11 login followed by a Wayland login. They also record a staged file-overlap check and a KDecoration3 symbol check. The repository does not include the exact environment, dependency snapshot, commands, full logs, or output RPM checksums needed to reproduce these reports. No build or runtime test was performed for this revision.
 
-The Workspace session package depends on `kwin6-x11 >= 6.8.0`; it must not require the old 6.7.5 package. Wayland remains supplied by the existing distribution packages and is not removed or replaced. The matched runtime packages are installed on the target. SDDM exposes the branded X11 session and stock Wayland choice; the first X11 login on the target remains to be tried.
+The maintainer reports that an earlier X11 experiment showed a black screen and empty panel on the target Mac Pro 5,1. This candidate is not accepted as usable; the failure is unresolved and Wayland must remain the stable fallback. Do not infer that separate package paths guarantee ABI compatibility or a working desktop.
+
+The Workspace package declares `kwin6-x11 >= 6.8.0`. Wayland remains supplied by the distribution packages and must not be removed or replaced. A release requires reproducible build records and repeatable X11 and Wayland VM acceptance evidence.

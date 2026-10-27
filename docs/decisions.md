@@ -4,30 +4,32 @@
 | --- | --- |
 | Umbrella project | Evrisselle |
 | First product | Evrisselle Ionis Undecima |
-| Purpose | Keep a usable Plasma X11 desktop available to people who need X11 |
-| First distribution | openSUSE Tumbleweed |
-| Target baseline | Plasma 6.8.1 on the user's Tumbleweed system |
-| Session model | X11 and Wayland are separate choices in the same login manager |
-| Initial implementation | Downstream forward-port of the removed X11 session and runtime paths to Plasma 6.8.1 |
-| KWin | Package the pinned Sonic-DE `sonic-win` community fork as a separate `kwin6-x11`; do not reuse the 6.7.5 binary |
-| Maintenance | Solo maintainer, best-effort updates and compatibility fixes, no SLA |
-| Public release | After a clean build and isolated-session acceptance checks |
+| Purpose | Explore a separately selectable Plasma X11 session for users who need X11 |
+| First distribution | openSUSE Tumbleweed x86_64 |
+| Target baseline | Plasma 6.8.1 source and package family |
+| Target hardware | Mac Pro 5,1; no hardware validation is claimed here |
+| Session model | X11 and Wayland are separate choices; preserve Wayland as the stable fallback |
+| Initial implementation | Downstream forward-port of removed X11 session and runtime paths |
+| KWin | Pinned SonicDE `sonic-win` community fork, packaged separately as `kwin6-x11` |
+| Maintenance | Solo maintainer, best-effort updates, no SLA |
+| Public release | Only after diagnosis, reproducible build evidence, licensing decisions, and acceptance checks |
 
-## Selected engineering scope
+## Current engineering assessment
 
-Plasma 6.8.1 is the chosen baseline. The work restores the X11 session startup path and the runtime code needed by a usable Plasma desktop, while preserving the distribution's Wayland session. The matched `sonic-win` KWin and Workspace RPMs built and passed an initial disposable-VM login check for both X11 and Wayland. They are now installed on the Mac Pro after a successful solver dry run and pre-install Snapper snapshot. Both SDDM choices are present, and the active Wayland session remains available; the first target X11 login and broader acceptance checks remain open.
+The package source attempts to restore the X11 startup path in Plasma Workspace and uses a separate KWin X11 implementation. The maintainer reports that an earlier X11 experiment produced a black screen and empty panel. The failure is unresolved; a usable X11 desktop is not established.
 
-KDE removed more than a CMake switch in 6.8. The workspace no longer builds `startplasma-x11` or installs the X11 session and systemd target; KWin's 6.8.1 source no longer builds `kwin_x11`; and Workspace components lost several X11 code paths. The 6.7.5 packaging prototype is not compatible with the selected baseline.
+Earlier repository notes report that the matched RPM set built in an isolated Tumbleweed environment and that both X11 and Wayland started in a disposable VM. The checked-in repository does not include the build logs, exact dependency snapshot, VM transcript, or resulting RPM checksums needed to reproduce those results. Treat them as historical reports, not independently verifiable acceptance evidence.
 
 ## Release and safety boundary
 
-- Do not publish or describe the source as a working 6.8.1 X11 session until it builds and passes the isolated VM acceptance checks.
-- Do not install the existing 6.7.5 X11 RPMs against the target's 6.8.1 stack.
-- Keep source archives, signatures, checksums, patches, and build instructions reproducible.
+- Do not describe this port as a working or installable X11 session until the failure is diagnosed and acceptance evidence is reproducible.
+- Do not mix the 6.7.5 fallback packages with the 6.8.1 baseline.
+- Preserve the stock Wayland path throughout future work.
+- Keep source archives, signatures or checksums, patches, build inputs, RPM checksums, and instructions together.
 - Keep SSH and sudo credentials out of scripts and Git.
-- Preserve a working Wayland login and a tested Btrfs/Snapper rollback path.
+- Do not install or remove packages, restart SDDM, switch the target session, or alter target permissions as part of this work.
 - Do not use KDE logos or claim official KDE support or endorsement.
 
 ## Fallback
 
-The earlier 6.7.5 prototype remains a separate fallback if the 6.8.1 forward-port proves impractical. Switching to it would require a new explicit decision and a complete package-set dry run; it is not the active implementation.
+The 6.7.5 prototype is retained only as a historical reference. Returning to it would require a separate compatibility decision and complete validation against an explicitly selected stack; it is not the active plan.

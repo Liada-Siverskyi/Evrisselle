@@ -1,30 +1,30 @@
 # Roadmap
 
-## MVP acceptance
+## Current state
 
-The 6.8.1 MVP is ready for a private test when a clean build succeeds for the target Tumbleweed snapshot and, in a disposable VM:
+The Plasma 6.8.1 Workspace and SonicDE KWin X11 package recipes are experimental source work. Previous project notes reported a successful build and initial disposable-VM login checks, but no logs or reproducible test artifacts are included. The maintainer later reported that the X11 attempt on the target Mac Pro 5,1 showed a black screen and empty panel. That failure is unresolved. The distribution's Wayland session is the required stable fallback.
 
-1. The existing Plasma Wayland choice remains available and starts normally.
-2. `Evrisselle Ionis Undecima` appears as a separate login-manager choice.
-3. The X11 session starts a complete Plasma desktop and survives repeated logout/login cycles.
-4. Window management, task switching, keyboard layouts, display changes, lock/unlock, suspend/resume, and X11 application launch work.
-5. Removing the Evrisselle packages leaves the stock Wayland session usable.
-6. The package source, source signatures/checksums, patch series, and installation instructions are published together.
+No package operation, SDDM restart, session switch, or permission change is part of this source task. Do not treat the target as validated or the port as ready to install.
 
 ## Milestones
 
-| Milestone | State | Output |
+| Milestone | State | Evidence needed |
 | --- | --- | --- |
-| Confirm target package and rollback state | Done | `docs/technical-audit.md` |
-| Record the selected 6.8.1 baseline and upstream removals | Done | `docs/decisions.md`, `docs/forward-port-audit.md` |
-| Restore KWin's standalone X11 window manager for 6.8.1 | RPM built and tested in the VM | Pinned Sonic-DE `sonic-win` source and recipe in `packaging/opensuse/plasma68-forwardport/kwin6-x11/` |
-| Restore Plasma Workspace X11 startup and shell paths | Clean RPM build and VM login passed | `packaging/opensuse/plasma68-forwardport/workspace/` |
-| Identify and restore other required Plasma X11 components | Initial matched package set identified; broader hardware/session audit remains | Dependency/source matrix |
-| Build the matched package set in OBS | Not started | Successful clean build for target Tumbleweed snapshot |
-| Validate both sessions in a disposable VM | X11 and Wayland login checks passed; repeated cycles and suspend/resume remain | Acceptance log and rollback evidence |
-| Prepare and run the target installer | Installed on the maintainer's Mac Pro; dry run and pre-install Snapper snapshot completed | First real X11 login on the target |
-| Publish the tested MVP source and packages | Source and package recipes are ready locally | Publish the tested source set; broader acceptance checks remain open |
+| Select openSUSE Tumbleweed x86_64 and Plasma 6.8.1 baseline | Recorded | `docs/decisions.md`, `docs/technical-audit.md` |
+| Audit upstream X11 removals and pin source inputs | Initial notes and source pins exist; audit is incomplete | Reproducible source comparison with revisions and checksums |
+| Build matched Workspace and KWin candidate packages | Prior notes report a successful isolated build; not independently reproducible from checked-in artifacts | Build environment definition, complete logs, RPM output checksums |
+| Reproduce and diagnose the black-screen / empty-panel failure | Open | Logs and screenshots from an isolated environment; root cause and fix |
+| Validate the complete X11 desktop in a disposable VM | Not established by repository evidence | Repeatable login, panel, input, logout, and Wayland-preservation results |
+| Validate broader hardware and session behavior | Not started / not evidenced | Display, lock, suspend/resume, applications, rollback, and repeated cycles |
+| Establish licensing for original Evrisselle materials | Open | Maintainer-selected license and file-level notices |
+| Publish a tested release | Blocked on diagnosis, licensing, and reproducible acceptance evidence | Source, licenses, checksums, build records, and test report together |
 
-## Release rule
+## Acceptance criteria
 
-Do not label the port installable or supported until the matched packages build and the VM acceptance checks pass. The first end-to-end session test must happen in a disposable VM, not on the maintainer's daily system.
+1. Stock Plasma Wayland remains available and starts successfully before and after testing.
+2. The branded X11 entry starts a complete desktop with a populated, interactive panel.
+3. Repeated login/logout, input, display changes, lock/unlock, suspend/resume, and X11 applications work in a disposable environment.
+4. Removing the candidate packages leaves the stock Wayland session usable.
+5. Source inputs, license notices, package outputs, and test evidence can be independently checked.
+
+A successful package build does not satisfy these criteria. Do not label the port ready or recommend installation before the acceptance evidence is recorded.

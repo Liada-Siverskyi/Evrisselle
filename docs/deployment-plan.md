@@ -1,36 +1,31 @@
-# Evrisselle deployment plan
+# Deployment and validation plan
 
 ## Goal
 
-Deliver Evrisselle Ionis Undecima as a separately selectable Plasma X11 session on the target openSUSE Tumbleweed x86_64 machine while keeping its ordinary Plasma Wayland session available. The private deployment target is the maintainer's Mac Pro.
+Explore a separately selectable Plasma X11 session on openSUSE Tumbleweed x86_64 for a Mac Pro 5,1, while preserving Plasma Wayland as the stable fallback. The X11 attempt has been reported to show a black screen and empty panel. This plan does not authorize or perform changes on the target machine.
 
-## Selected baseline
+## Selected source baseline
 
-The implementation targets Plasma 6.8.1, matching the target's current workspace, desktop, and Wayland KWin packages. This is the maintainer's selected route. KDE removed the X11 login path and several X11 runtime paths in Plasma 6.8, so the work requires downstream source changes in KWin and Plasma Workspace. More package changes may be needed after the audit.
-
-The earlier SDDM attempt used `kwin6-x11` and `plasma6-session-x11` at 6.7.5 against the 6.8.1 base and failed. A read-only SSH check before the new install confirmed the old packages were absent while Plasma and Wayland KWin remained at 6.8.1. The matched candidate has now been installed after isolated testing.
+The package source targets Plasma 6.8.1. KDE removed the X11 login path and several X11 runtime paths in Plasma 6.8, so the project carries downstream changes in Workspace and packages a separate KWin X11 community fork. Source inputs are pinned in the OBS services. A complete, reproducible build environment and RPM provenance record are not yet in the public repository.
 
 ## Work sequence
 
-1. Keep `docs/forward-port-audit.md` current as each affected upstream component is inspected.
-2. Pin the exact 6.8.1 source revisions and record archive signatures and SHA-256 checksums.
-3. Build the separate `kwin6-x11` package from the pinned Sonic-DE community fork and finish the Plasma Workspace patch in `packaging/opensuse/plasma68-forwardport/workspace/`. Add package changes for other components only when the audit demonstrates they are required.
-4. Package the changed components as one matched Tumbleweed set. Keep the ordinary Wayland session in the existing distribution package path.
-5. Build in OBS or a disposable openSUSE build environment against the same dependency snapshot as the target. Resolve package dependencies and conflicts before making an installer. **Done for the initial matched RPM set** in an isolated Tumbleweed environment.
-6. Install into a disposable VM and validate both sessions, lock/unlock, logout, input, display changes, suspend/resume, and X11 applications. Verify uninstall and rollback. **The first X11 login and a subsequent Wayland login passed; repeated cycles and the remaining acceptance checks are open.**
-7. Use an SSH installation command that verifies staged checksums, runs a package-manager dry run, prompts for remote privileges, and creates a Snapper root snapshot before package changes. It must not store SSH or sudo credentials. **The one-off command completed without storing credentials.**
-8. Run the target dry run and create a pre-install Snapper root snapshot. **Complete on 2026-10-26:** all six checksummed RPMs installed on the maintainer's Mac Pro. The package-manager dry run resolved a 10-package transaction; installation completed, and SDDM contains both `Evrisselle Ionis Undecima` and `Plasma (Wayland)`. The existing Wayland session remained active after the change.
-9. Publish package source and instructions only after the isolated acceptance checks pass.
+1. Keep the forward-port audit current, with upstream references and exact source revisions.
+2. Diagnose the black screen and empty panel in an isolated, disposable environment. Capture logs and the test setup; do not infer cause from package installation alone.
+3. Publish the build environment definition, dependency snapshot, exact build commands, complete logs, and output RPM checksums.
+4. Build the matched package set in a disposable openSUSE environment against the documented snapshot.
+5. In a disposable VM, validate X11 startup, panel interaction, logout/login, input, display changes, lock/unlock, suspend/resume, X11 applications, Wayland startup, and rollback.
+6. Review package transactions and rollback instructions for a future hardware test only after the isolated acceptance checks pass. Do not run that test as part of this source work.
+7. Resolve licensing for original Evrisselle materials and publish source, notices, checksums, instructions, and acceptance evidence together.
 
-## Installation safeguards
+## Existing reports and evidence limits
 
-- Never install the current 6.7.5 `kwin6-x11` or `plasma6-session-x11` packages alone against Plasma 6.8.1.
-- Preserve the stock Wayland session files and a tested way to select Wayland from SDDM.
-- Review the package-manager solver's complete transaction; a repository-priority change does not establish ABI compatibility.
-- Require a verified pre-change Btrfs/Snapper snapshot before changing the target packages.
-- Keep credentials outside scripts, command history, and Git.
-- Treat every Plasma version update as a new compatibility review.
+Older project notes record a Tumbleweed container build, a disposable-VM X11 login followed by a Wayland login, and a target package transaction on 2026-10-26. The source repository does not include logs or artifacts sufficient to reproduce those reports. The maintainer's later black-screen / empty-panel report means the X11 result cannot be considered accepted. This plan does not claim the current machine state or rely on a current remote inspection.
 
-## Current state
+## Constraints
 
-SSH key authentication to the target works. Remote `sudo` requires an interactive password, which was entered at the terminal prompt and was not stored. The target has a Btrfs root filesystem and a configured Snapper `root` profile; a pre-install root snapshot was created. The matched candidate RPM set built in an isolated Tumbleweed 20261024 environment. A disposable VM installed the set, logged into the X11 session with `Type=x11`, then successfully started Wayland with `Type=wayland`. On the target, the transaction completed successfully and installed the six matched RPMs plus four solver-selected dependencies. Both session entries are present, and the active session is still Wayland. The user's first X11 login on the Mac Pro remains to be tried from SDDM; broader acceptance checks remain open. The target has KDecoration3 6.8.0 while the build environment has 6.8.1; symbol compatibility was checked.
+- No package install, removal, or replacement on the Mac Pro.
+- No SDDM restart or session change.
+- No permission or access-control change.
+- Preserve Wayland and an independently documented recovery route for any future validation.
+- Do not claim release readiness based only on a successful build.

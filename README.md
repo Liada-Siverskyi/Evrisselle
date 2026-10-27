@@ -1,26 +1,27 @@
 # Evrisselle Ionis Undecima
 
-Evrisselle is the project umbrella. **Ionis Undecima** is its first product: a separately selectable KDE Plasma X11 session alongside the system's Plasma Wayland session.
+Evrisselle is an independent downstream project exploring a separately selectable KDE Plasma X11 session for openSUSE Tumbleweed x86_64. **Ionis Undecima** is the session concept; Plasma (Wayland) remains the distribution-provided session and must remain usable.
 
-The first target is openSUSE Tumbleweed. The maintainer selected Plasma 6.8.1 as the starting baseline and the project is auditing and forward-porting the removed X11 session support. It does not replace Wayland or claim to be an official KDE product.
+This is not an official KDE product. KDE source, the SonicDE KWin fork, and openSUSE packaging retain their own names, licenses, and notices.
 
-## Current state
+## Status
 
-The repository contains a Plasma Workspace 6.8.1 port and a separately packaged KWin X11 community fork. The matched RPM set built in an isolated Tumbleweed environment and passed an install-and-login check in a disposable KDE VM: SDDM launched `Evrisselle Ionis Undecima` as an X11 session, and Plasma (Wayland) also started afterward. The six checksum-verified RPMs are now installed on the target Mac Pro. SDDM has separate `Evrisselle Ionis Undecima` and `Plasma (Wayland)` entries; the active Wayland session remained running after installation.
+The public source contains experimental packaging for a Plasma Workspace 6.8.1 X11 forward-port and a separately packaged SonicDE KWin X11 fork. The selected target is a Mac Pro 5,1 running openSUSE Tumbleweed x86_64.
 
-The existing package spec under `packaging/opensuse/plasma6-workspace/` is a 6.7.5 prototype retained as a fallback reference. Do not install its X11 packages against the target machine's 6.8.1 base. The target's stale 6.7.5 X11 runtime library was replaced by the matched set.
+The earlier X11 experiment did not produce a usable desktop on the target: the reported result was a black screen with an empty panel. The project is therefore **not ready to install or use**. The stable Wayland session is the required fallback and must be preserved throughout further work. Do not infer a successful target login from package installation or from the historical test notes below.
 
-See the [selected deployment plan](docs/deployment-plan.md), [forward-port audit](docs/forward-port-audit.md), and [target technical audit](docs/technical-audit.md) before changing the machine.
+The repository's previous documentation recorded a clean build and X11/Wayland logins in a disposable VM, as well as a package installation on the target. Those are historical maintainer-reported results; the repository contains no build logs, VM image, test transcript, or hardware capture to independently reproduce them. They do not resolve the black-screen report. No new build or hardware test is claimed by this revision.
 
-## Project notes
+## Source layout
 
-- [Architecture](docs/architecture.md)
-- [Decisions and scope](docs/decisions.md)
-- [Forward-port audit](docs/forward-port-audit.md)
-- [Target technical audit](docs/technical-audit.md)
-- [Milestones](docs/roadmap.md)
-- [Deployment plan](docs/deployment-plan.md)
-- [Licensing and branding rules](docs/licensing.md)
-- [6.7.5 fallback packaging prototype](packaging/opensuse/plasma6-workspace/README.md)
-- [Plasma 6.8.1 Workspace port source](packaging/opensuse/plasma68-forwardport/workspace/README.md)
-- [KWin X11 candidate package](packaging/opensuse/plasma68-forwardport/kwin6-x11/README.md)
+- [`packaging/opensuse/plasma68-forwardport/workspace/`](packaging/opensuse/plasma68-forwardport/workspace/) — Plasma Workspace 6.8.1 spec, source service, and downstream patch series.
+- [`packaging/opensuse/plasma68-forwardport/kwin6-x11/`](packaging/opensuse/plasma68-forwardport/kwin6-x11/) — candidate KWin X11 package from a pinned SonicDE community-fork commit.
+- [`packaging/opensuse/plasma6-workspace/`](packaging/opensuse/plasma6-workspace/) — older 6.7.5 prototype retained for reference; it is not compatible with the selected 6.8.1 stack.
+- [`docs/`](docs/) — architecture, decisions, audits, deployment constraints, roadmap, and licensing notes.
+- [`docs/change-history.md`](docs/change-history.md) — commit-level summary of the existing public history at the current base revision.
+
+## Safety and release status
+
+Do not install, remove, or replace packages on the Mac Pro as part of this source work. Do not restart SDDM, change login sessions, or alter access permissions. All development and validation should happen in reviewable source branches and disposable build/VM environments. Any future hardware validation must be separately planned after the black-screen failure is understood, with Wayland access and rollback preserved.
+
+The packages and port are experimental. A successful build alone does not establish a working session. See [the technical audit](docs/technical-audit.md), [forward-port audit](docs/forward-port-audit.md), [deployment plan](docs/deployment-plan.md), and [licensing notes](docs/licensing.md) for evidence limits and remaining work.
